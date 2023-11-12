@@ -1,0 +1,49 @@
+version: "3.5"
+services:
+    mariadb-glpi: 
+        image: fametec/mariadb-glpi:9.4.6
+        restart: unless-stopped
+        volumes:
+          - mariadb-glpi-volume:/var/lib/mysql:rw
+        environment: 
+          MYSQL_DATABASE: glpi
+          MYSQL_USER: glpi 
+          MYSQL_PASSWORD: glpi 
+          MYSQL_RANDOM_ROOT_PASSWORD: 1 
+          #        ports:
+          #- 3306:3306
+        networks: 
+          - glpi-backend
+#
+#
+    glpi: 
+        image: docker.io/mguazzardo/glpi-buggy 
+        restart: unless-stopped
+        volumes:
+          - glpi-volume-files:/var/www/html/files:rw
+          - glpi-volume-plugins:/var/www/html/html/glpi/plugins:rw
+        depends_on: 
+          - mariadb-glpi
+        ports: 
+          - 80:80
+        networks: 
+          - glpi-frontend
+          - glpi-backend
+
+    #     restart: unless-stopped
+    #     volumes:
+    #       - glpi-volume-files:/usr/share/nginx/html/glpi/files:rw
+    #       - glpi-volume-plugins:/usr/share/nginx/html/glpi/plugins:rw
+    #     depends_on:
+    #       - mariadb-glpi
+    #     networks:
+    #       - glpi-backend
+#
+networks: 
+    glpi-frontend: 
+    glpi-backend:
+#
+volumes:
+    glpi-volume-files:
+    glpi-volume-plugins:
+    mariadb-glpi-volume:
